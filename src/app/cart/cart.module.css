@@ -1,0 +1,20 @@
+.cartGrid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .cartGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cartItems {
+    display: flex;
+    flex-direction: column;
+}
+
+.cartSummary {
+    /* Sticky behavior handled inline for simplicity in component but could be here */
+}

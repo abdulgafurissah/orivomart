@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------------------------------
+// USERS & PROFILES
+// --------------------------------------------------------
+// We map this to the Auth Users table if possible, or just keep a profile syncing
+model Profile {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Hashed password
+  fullName  String?  @map("full_name")
+  role      String   @default("buyer") // admin, seller, courier
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  seller    Seller?
+  orders    Order[]  @relation("BuyerOrders")
+  
+  @@map("profiles")
+}
+
+// --------------------------------------------------------
+// SELLERS
+// --------------------------------------------------------
+model Seller {
+  id                        String   @id @default(uuid())
+  userId                    String   @unique @map("user_id") // Link to Profile/Auth
+  profile                   Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  shopName                  String   @map("shop_name")
+  ownerName                 String   @map("owner_name")
+  email                     String
+  phone                     String?
+  image                     String?
+  coverImage                String?  @map("cover_image")
+  description               String?
+  
+  // Address / KYC
+  address                   String?
+  city                      String?
+  gpsAddress                String?  @map("gps_address")
+  businessAddress           String?  @map("business_address")
+  businessRegNum            String?  @map("business_registration_number")
+  ghanaCardNum              String?  @map("ghana_card_number")
+  kycDocUrl                 String?  @map("kyc_document_url")
+  
+  // Status
+  verified                  Boolean  @default(false)
+  status                    String   @default("pending") // pending, active, suspended
+  rating                    Decimal  @default(0)
+  productsCount             Int      @default(0)
+  
+  // Payment
+  paystackSubaccountCode    String?  @map("paystack_subaccount_code")
+  
+  // Relations
+  items                     OrderItem[]
+  products                  Product[]
+  
+  createdAt                 DateTime @default(now()) @map("created_at")
+
+  @@map("sellers")
+}
+
+// --------------------------------------------------------
+// PRODUCTS
+// --------------------------------------------------------
+model Product {
+  id          String   @id @default(uuid())
+  sellerId    String   @map("seller_id")
+  seller      Seller   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  price       Decimal
+  stock       Int      @default(0)
+  image       String?
+  category    String?
+  
+  status      String   @default("active") // active, suspended, draft
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+// --------------------------------------------------------
+// ORDERS
+// --------------------------------------------------------
+model Order {
+  id               String   @id @default(uuid())
+  buyerId          String?  @map("buyer_id")
+  buyer            Profile? @relation("BuyerOrders", fields: [buyerId], references: [id])
+  
+  totalAmount      Decimal  @map("total_amount")
+  currency         String   @default("GHS")
+  status           String   @default("pending") // pending, paid, failed
+  paymentReference String?  @map("payment_reference")
+  shippingDetails  Json?    @map("shipping_details")
+  
+  items            OrderItem[]
+  
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("orders")
+}
+
+// --------------------------------------------------------
+// ORDER ITEMS (DELIVERIES)
+// --------------------------------------------------------
+model OrderItem {
+  id             String   @id @default(uuid())
+  
+  orderId        String   @map("order_id")
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  sellerId       String?  @map("seller_id")
+  seller         Seller?  @relation(fields: [sellerId], references: [id])
+  
+  productId      String   @map("product_id")
+  productName    String?  @map("product_name")
+  quantity       Int
+  price          Decimal
+  
+  // Delivery
+  courierId      String?  @map("courier_id") // Could link to Profile if needed
+  trackingCode   String?  @map("tracking_code")
+  deliveryStatus String   @default("pending_pickup") @map("delivery_status")
+  
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("order_items")
+}

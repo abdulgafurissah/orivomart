@@ -1,29 +1,39 @@
 :root {
-  /* Color Palette - Agro Theme */
-  --primary: #2ecc71;
-  --primary-hover: #27ae60;
-  --secondary: #f1c40f;
-  --accent: #e67e22;
+  /* Color Palette - Professional Light Theme */
+  --primary: #4361ee;
+  /* Royal Blue - Trust & Professionalism */
+  --primary-hover: #3a56d4;
+  --secondary: #f72585;
+  /* Vibrant Pink/Orange - Excitement Accent */
+  --accent: #ff9f1c;
+  /* Warm Orange - Call to Action */
 
-  /* Dark Mode Base */
-  --bg-color: #0d1117;
-  --surface-color: #161b22;
-  --surface-hover: #21262d;
+  /* Light Base */
+  --bg-color: #f7f9fc;
+  /* Clean Light Gray/Blue Tint */
+  --surface-color: #ffffff;
+  --surface-hover: #f1f3f7;
 
-  /* Typography */
-  --text-primary: #f0f6fc;
-  --text-secondary: #8b949e;
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Typography - High Contrast */
+  --text-primary: #1e293b;
+  /* Slate 900 */
+  --text-secondary: #64748b;
+  /* Slate 500 */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Glassmorphism */
-  --glass-bg: rgba(22, 27, 34, 0.7);
-  --glass-border: rgba(240, 246, 252, 0.1);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  /* Card / Panel Styles */
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+  /* Input/Form Elements */
+  --input-bg: #f8fafc;
+  --input-border: #cbd5e1;
 
   /* Spacing & Radius */
   --radius-sm: 6px;
   --radius-md: 12px;
-  --radius-lg: 20px;
+  --radius-lg: 16px;
   --container-width: 1200px;
 }
 
@@ -44,7 +54,7 @@ body {
 a {
   color: inherit;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 /* Utilities */
@@ -63,45 +73,54 @@ a {
   font-weight: 600;
   cursor: pointer;
   border: none;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  background: var(--primary);
   color: white;
-  box-shadow: 0 4px 14px rgba(46, 204, 113, 0.4);
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
 }
 
 .btn-primary:hover {
+  background: var(--primary-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+  box-shadow: 0 6px 16px rgba(67, 97, 238, 0.4);
 }
 
 .btn-secondary {
-  background: var(--surface-color);
+  background: white;
   color: var(--text-primary);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--input-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .btn-secondary:hover {
-  background: var(--surface-hover);
+  background: #f8fafc;
   border-color: var(--primary);
+  color: var(--primary);
 }
 
+/* Modern Clean Card - Instead of Dark Glass */
 .glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--glass-shadow);
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.glass-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
 }
 
 /* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
 
   to {
@@ -111,12 +130,63 @@ a {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.8s ease-out forwards;
+  animation: fadeIn 0.6s ease-out forwards;
 }
 
 .text-gradient {
-  background: linear-gradient(to right, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  font-weight: 800;
+}
+
+/* Form Styles Override for Light Theme */
+input,
+select,
+textarea {
+  background: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  color: var(--text-primary) !important;
+  transition: border-color 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+/* Table Styles */
+table {
+  width: 100%;
+}
+
+th {
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+td {
+  color: var(--text-primary);
+}
+
+tr {
+  border-bottom: 1px solid var(--card-border) !important;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  h1 {
+    font-size: 1.8rem !important;
+    /* Scale down headers */
+  }
 }

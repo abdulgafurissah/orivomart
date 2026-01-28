@@ -23,7 +23,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     // Load cart from local storage on mount
     useEffect(() => {
-        const savedCart = localStorage.getItem('agifarmz_cart');
+        const savedCart = localStorage.getItem('orivomart_cart');
         if (savedCart) {
             try {
                 setCart(JSON.parse(savedCart));
@@ -35,7 +35,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     // Save cart to local storage whenever it changes
     useEffect(() => {
-        localStorage.setItem('agifarmz_cart', JSON.stringify(cart));
+        localStorage.setItem('orivomart_cart', JSON.stringify(cart));
     }, [cart]);
 
     const addToCart = (product: Product) => {

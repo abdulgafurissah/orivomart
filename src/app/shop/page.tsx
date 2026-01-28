@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { products } from '@/data/mockData';
+import { useState, useMemo, Suspense } from 'react';
+import { products, shops, Product } from '@/data/mockData';
 import { useCart } from '@/context/CartContext';
+import { useSearchParams } from 'next/navigation';
 
-const categories = ['All', 'seeds', 'fertilizers', 'pesticides', 'equipment', 'feed', 'medicine'];
+const categories = ['All', 'electronics', 'clothing', 'home', 'beauty', 'sports', 'toys', 'groceries', 'books'];
 
-export default function ShopPage() {
+function ShopContent() {
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
     const { addToCart } = useCart();
@@ -19,14 +20,21 @@ export default function ShopPage() {
         });
     }, [selectedCategory, searchQuery]);
 
-    const handleAddToCart = (product: any) => {
+    const handleAddToCart = (product: Product) => {
         addToCart(product);
         alert(`Added ${product.name} to cart!`);
     };
 
+    const getShopName = (shopId: string) => {
+        const shop = shops.find(s => s.id === shopId);
+        return shop ? shop.name : 'Unknown Shop';
+    };
+
     return (
         <div className="container" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Marketplace</h1>
+            <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>
+                All Products
+            </h1>
 
             <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '2rem' }}>
                 {/* Sidebar Filters */}
@@ -104,10 +112,10 @@ export default function ShopPage() {
                             </div>
 
                             <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>{product.seller}</div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>{getShopName(product.shopId)}</div>
                                 <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>{product.name}</h3>
                                 <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--primary)' }}>₦{product.price.toLocaleString()}</span>
+                                    <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--primary)' }}>GH₵ {product.price.toLocaleString()}</span>
                                     <button
                                         onClick={() => handleAddToCart(product)}
                                         className="btn btn-primary"
@@ -128,5 +136,13 @@ export default function ShopPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function ShopPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ShopContent />
+        </Suspense>
     );
 }

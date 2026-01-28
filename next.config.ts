@@ -7,7 +7,24 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'dummyimage.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ecoonixruxtgtfwfrjqv.supabase.co',
+      },
     ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '6mb', // Allow 5MB image + metadata
+    },
   },
 };
 

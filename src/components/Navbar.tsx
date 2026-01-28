@@ -36,7 +36,7 @@ export default function Navbar({ user }: NavbarProps) {
                 <div className="container">
                     <div className={styles.navInner}>
                         <Link href="/" className={styles.logo} onClick={() => setMobileMenuOpen(false)}>
-                            <span className="text-gradient">OrivoMart</span>
+                            <img src="/logo.png" alt="OrivoMart" style={{ height: '40px', objectFit: 'contain' }} />
                         </Link>
 
                         {/* Desktop Links */}

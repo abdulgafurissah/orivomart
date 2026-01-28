@@ -44,3 +44,6 @@ next-env.d.ts
 
 # secrets
 TEST_CREDENTIALS*
+
+# documentation
+APP_WORKFLOW.md

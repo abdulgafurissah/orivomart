@@ -10,9 +10,6 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'OrivoMart | Official Marketplace',
   description: 'The premier marketplace for top brands, electronics, fashion, and more.',
-  icons: {
-    icon: '/logo.png',
-  },
 };
 
 export default async function RootLayout({

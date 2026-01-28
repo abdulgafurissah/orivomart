@@ -229,7 +229,6 @@ export default function SellersClient({ shops }: { shops: any[] }) {
                                         </div>
                                     )}
 
-                                    <div style={{ fontSize: '3rem', zIndex: 1 }}>🏪</div>
                                 </div>
                             )}
 

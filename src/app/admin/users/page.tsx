@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createUser } from '@/app/actions/create-user';
-import { getAllUsers, updateUserRole } from '@/app/actions/user-management';
+import { getAllUsers, updateUserRole, deleteUser } from '@/app/actions/user-management';
 
 interface Profile {
     id: string;
@@ -55,6 +55,18 @@ export default function UserManagement() {
             console.error(result.error);
         } else {
             setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
+        }
+    };
+
+    const handleDelete = async (userId: string) => {
+        if (!confirm('Are you sure you want to PERMANENTLY delete this user? This action cannot be undone.')) return;
+
+        const result = await deleteUser(userId);
+        if (result.error) {
+            alert(result.error);
+        } else {
+            alert('User deleted successfully');
+            setUsers(users.filter(u => u.id !== userId));
         }
     };
 
@@ -135,24 +147,41 @@ export default function UserManagement() {
                                 <td style={{ padding: '12px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                                     {new Date(user.created_at).toLocaleDateString()}
                                 </td>
-                                <td style={{ padding: '12px' }}>
+                                <td style={{ padding: '12px', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                     <select
                                         value={user.role}
                                         onChange={(e) => updateRole(user.id, e.target.value)}
+                                        disabled={user.role === 'admin'}
                                         style={{
                                             background: 'rgba(0,0,0,0.3)',
-                                            color: 'white',
+                                            color: user.role === 'admin' ? '#999' : 'white',
                                             border: '1px solid var(--glass-border)',
                                             padding: '4px 8px',
-                                            borderRadius: '4px'
+                                            borderRadius: '4px',
+                                            cursor: user.role === 'admin' ? 'not-allowed' : 'pointer'
                                         }}
                                     >
                                         <option value="buyer">Buyer</option>
                                         <option value="seller">Seller</option>
-                                        <option value="admin">Admin</option>
                                         <option value="delivery_manager">Delivery Mgr</option>
                                         <option value="courier">Courier</option>
                                     </select>
+
+                                    {user.role !== 'admin' && (
+                                        <button
+                                            onClick={() => handleDelete(user.id)}
+                                            className="btn"
+                                            style={{
+                                                padding: '4px 8px',
+                                                fontSize: '0.8rem',
+                                                background: 'rgba(231, 76, 60, 0.2)',
+                                                color: '#e74c3c',
+                                                border: '1px solid #e74c3c'
+                                            }}
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

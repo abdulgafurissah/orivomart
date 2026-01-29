@@ -31,3 +31,23 @@ export async function updateUserRole(userId: string, newRole: string) {
         return { error: e.message };
     }
 }
+
+export async function deleteUser(userId: string) {
+    try {
+        const user = await prisma.profile.findUnique({
+            where: { id: userId }
+        });
+
+        if (!user) return { error: 'User not found' };
+        if (user.role === 'admin') return { error: 'Cannot delete an Admin user' };
+
+        await prisma.profile.delete({
+            where: { id: userId }
+        });
+
+        return { success: true };
+    } catch (e: any) {
+        console.error('Error deleting user:', e);
+        return { error: e.message };
+    }
+}

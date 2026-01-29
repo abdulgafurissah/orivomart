@@ -25,6 +25,7 @@ model Profile {
   // Relations
   seller    Seller?
   orders    Order[]  @relation("BuyerOrders")
+  disputes  Dispute[]
   
   @@map("profiles")
 }
@@ -110,6 +111,7 @@ model Order {
   shippingDetails  Json?    @map("shipping_details")
   
   items            OrderItem[]
+  disputes         Dispute[]
   
   createdAt        DateTime @default(now()) @map("created_at")
 
@@ -141,4 +143,26 @@ model OrderItem {
   createdAt      DateTime @default(now()) @map("created_at")
 
   @@map("order_items")
+}
+
+// --------------------------------------------------------
+// DISPUTES
+// --------------------------------------------------------
+model Dispute {
+  id          String   @id @default(uuid())
+  
+  orderId     String   @map("order_id")
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  buyerId     String   @map("buyer_id")
+  buyer       Profile  @relation(fields: [buyerId], references: [id])
+  
+  reason      String   // e.g., "Not received", "Damaged", "Wrong item"
+  description String
+  status      String   @default("open") // open, resolved, closed
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("disputes")
 }

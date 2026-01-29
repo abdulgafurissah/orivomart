@@ -1,8 +1,8 @@
-
 import { getSession } from '@/utils/session';
 import { prisma } from '@/utils/prisma';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import ReportDisputeModal from './ReportDisputeModal';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +19,8 @@ export default async function CustomerOrdersPage() {
                         select: { shopName: true }
                     }
                 }
-            }
+            },
+            disputes: true
         },
         orderBy: { createdAt: 'desc' }
     });
@@ -47,9 +48,13 @@ export default async function CustomerOrdersPage() {
                                     <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Total</div>
                                     <div style={{ fontWeight: 'bold' }}>{order.currency} {Number(order.totalAmount).toLocaleString()}</div>
                                 </div>
-                                <div>
+                                <div style={{ textAlign: 'right' }}>
                                     <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Order ID</div>
-                                    <div style={{ fontFamily: 'monospace' }}>#{order.id.slice(0, 8)}</div>
+                                    <div style={{ fontFamily: 'monospace', marginBottom: '5px' }}>#{order.id.slice(0, 8)}</div>
+                                    <ReportDisputeModal
+                                        orderId={order.id}
+                                        existingDispute={order.disputes && order.disputes.length > 0 ? order.disputes[0] : null}
+                                    />
                                 </div>
                             </div>
 

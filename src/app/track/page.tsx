@@ -1,6 +1,6 @@
 
-
 import Link from 'next/link';
+import LiveTrackingMap from '@/components/LiveTrackingMap';
 
 export default async function TrackOrderPage({
     searchParams,
@@ -37,10 +37,6 @@ export default async function TrackOrderPage({
                     tracking_code: item.trackingCode,
                     product_name: item.productName,
                 };
-                // NOTE: The UI uses snake_case properties from Supabase result. 
-                // We mapped specific fields back to what the UI expects below or in the object above.
-                // Or better, I should update the UI usage below.
-                // Let's rely on standard Prisma camelCase but for now mapped manually to avoid UI breakages in one go.
             }
         } catch (e) {
             console.error('Tracking Error', e);
@@ -118,7 +114,7 @@ export default async function TrackOrderPage({
                             }}></div>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
                             <div>
                                 <h3 style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Item Details</h3>
                                 <p style={{ fontWeight: 'bold' }}>{trackingResult.product_name}</p>
@@ -136,6 +132,22 @@ export default async function TrackOrderPage({
                                 </p>
                             </div>
                         </div>
+
+                        {trackingResult.delivery_status === 'in_transit' && (
+                            <div style={{ marginTop: '2rem', borderTop: '1px solid var(--glass-border)', paddingTop: '2rem' }}>
+                                <h3 style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>Live Delivery Map</h3>
+                                <LiveTrackingMap
+                                    trackingCode={trackingResult.tracking_code!}
+                                    destLat={5.6037}
+                                    destLng={-0.1870}
+                                    destAddress={trackingResult.order?.shippingDetails ? (
+                                        typeof trackingResult.order.shippingDetails === 'string'
+                                            ? JSON.parse(trackingResult.order.shippingDetails).address
+                                            : (trackingResult.order.shippingDetails as any).address
+                                    ) : 'Destination'}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

@@ -1,5 +1,6 @@
 import { getCourierDeliveries } from '@/app/actions/delivery-actions';
 import CourierAction from './CourierAction';
+import CourierLocationUpdater from '@/components/delivery/CourierLocationUpdater';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,6 +10,8 @@ export default async function CourierDashboard() {
     return (
         <div className="container" style={{ padding: '2rem' }}>
             <h1 style={{ marginBottom: '2rem' }}>My Deliveries</h1>
+
+            <CourierLocationUpdater />
 
             {deliveries.length === 0 ? (
                 <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center' }}>

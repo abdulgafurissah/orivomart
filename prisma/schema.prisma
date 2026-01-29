@@ -21,6 +21,11 @@ model Profile {
   fullName  String?  @map("full_name")
   role      String   @default("buyer") // admin, seller, courier
   createdAt DateTime @default(now()) @map("created_at")
+
+  // Live Location (for Couriers)
+  currentLat          Float?    @map("current_lat")
+  currentLng          Float?    @map("current_lng")
+  lastLocationUpdate  DateTime? @map("last_location_update")
   
   // Relations
   seller    Seller?

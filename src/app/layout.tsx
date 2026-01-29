@@ -5,6 +5,8 @@ import Navbar from '@/components/Navbar';
 import { CartProvider } from '@/context/CartContext';
 import { getSession } from '@/utils/session';
 
+import Footer from '@/components/Footer';
+
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
@@ -22,8 +24,11 @@ export default async function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <CartProvider>
           <Navbar user={await getSession()} />
-          <main style={{ paddingTop: '80px', minHeight: '100vh' }}>
-            {children}
+          <main style={{ paddingTop: '80px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1 }}>
+              {children}
+            </div>
+            <Footer />
           </main>
         </CartProvider>
       </body>

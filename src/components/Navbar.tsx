@@ -92,6 +92,11 @@ export default function Navbar({ user }: NavbarProps) {
                                     </>
                                 ) : (
                                     <>
+                                        {user.role === 'buyer' && (
+                                            <Link href="/auth/signup" className="btn btn-secondary" style={{ marginRight: '10px', padding: '8px 20px', fontSize: '0.9rem' }}>
+                                                Sell
+                                            </Link>
+                                        )}
                                         <Link href="/account" className="btn btn-secondary" style={{ marginRight: '10px', padding: '8px 20px', fontSize: '0.9rem' }}>
                                             My Account
                                         </Link>
@@ -152,6 +157,11 @@ export default function Navbar({ user }: NavbarProps) {
                     </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {user.role === 'buyer' && (
+                            <Link href="/auth/signup" className="btn btn-secondary" onClick={() => setMobileMenuOpen(false)}>
+                                Become a Seller
+                            </Link>
+                        )}
                         <Link href="/account" className="btn btn-secondary" onClick={() => setMobileMenuOpen(false)}>
                             My Account
                         </Link>

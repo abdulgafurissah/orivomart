@@ -1,5 +1,6 @@
 
 import { getPublicProducts, getPublicSellers } from './actions/public-actions';
+import { getSession } from '@/utils/session';
 import HomeClient from './home-client';
 
 export const dynamic = 'force-dynamic';
@@ -7,6 +8,7 @@ export const dynamic = 'force-dynamic';
 export default async function Home() {
   const products = await getPublicProducts();
   const sellers = await getPublicSellers();
+  const session = await getSession();
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -50,7 +52,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
       />
-      <HomeClient products={products} sellers={sellers} />
+      <HomeClient products={products} sellers={sellers} user={session} />
     </>
   );
 }

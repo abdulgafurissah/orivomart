@@ -142,7 +142,8 @@
 /* Mobile Responsiveness */
 @media (max-width: 900px) {
   .heroTitle {
-    font-size: 2.5rem !important; /* Override inline if necessary or applied via class */
+    font-size: 2.5rem !important;
+    /* Override inline if necessary or applied via class */
   }
 }
 
@@ -153,18 +154,20 @@
   }
 
   .heroVisualContainer {
-    height: 300px; /* Smaller height on mobile */
+    height: 300px;
+    /* Smaller height on mobile */
     /* Optionally hide complex visual on very small screens or just stack */
   }
 
   /* Show visual but scaled? Let's hide for simplicity or stack it */
   /* Actually, let's keep it but stack it */
   .heroVisualContainer {
-      display: flex;
-      order: -1; /* visual on top? or bottom? */
-      margin-bottom: 2rem;
+    display: flex;
+    order: -1;
+    /* visual on top? or bottom? */
+    margin-bottom: 2rem;
   }
-  
+
   .marketplaceLayout {
     grid-template-columns: 1fr;
   }
@@ -174,9 +177,12 @@
     top: 0 !important;
     margin-bottom: 2rem;
   }
-  
+
   .hero {
-      padding: 2rem 1rem;
+    padding: 6rem 1rem 2rem 1rem !important;
+    /* Top padding to account for fixed navbar + breathing room */
+    min-height: auto !important;
+    /* Let content dictate height, don't force 80vh which is huge */
   }
 }
 

@@ -64,10 +64,9 @@ export default function HomeClient({ products, sellers }: { products: any[], sel
                         backgroundSize: '30px 30px'
                     }}></div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-
+                    <div className={styles.heroGrid}>
                         {/* Left Content */}
-                        <div className="animate-fade-in">
+                        <div className="animate-fade-in" style={{ textAlign: 'left' }}> {/* Keep text align left on desktop, mobile can override via CSS if needed, but flex-col usually wants centered or left. CSS has text-align: center for mobile */}
                             <SlideIn delay={0.2}>
                                 <span style={{
                                     background: 'rgba(255,255,255,0.2)',
@@ -83,11 +82,11 @@ export default function HomeClient({ products, sellers }: { products: any[], sel
                                 </span>
                             </SlideIn>
                             <SlideIn delay={0.3}>
-                                <h1 style={{
-                                    fontSize: '3.5rem',
+                                <h1 className={styles.heroTitle} style={{
                                     lineHeight: '1.2',
                                     marginBottom: '1.5rem',
                                     fontWeight: '800'
+                                    /* fontSize moved to CSS */
                                 }}>
                                     Shopping Made <br />
                                     <span style={{ color: '#ffd166' }}>Simple & Joyful</span>
@@ -106,7 +105,7 @@ export default function HomeClient({ products, sellers }: { products: any[], sel
                             </SlideIn>
 
                             <SlideIn delay={0.5}>
-                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
@@ -153,7 +152,7 @@ export default function HomeClient({ products, sellers }: { products: any[], sel
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            style={{ position: 'relative', height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                            className={styles.heroVisualContainer}
                         >
                             {/* Center Circle */}
                             <motion.div
@@ -164,7 +163,8 @@ export default function HomeClient({ products, sellers }: { products: any[], sel
                                     height: '300px',
                                     borderRadius: '50%',
                                     border: '2px dashed rgba(255,255,255,0.2)',
-                                    position: 'absolute'
+                                    position: 'absolute',
+                                    maxWidth: '100%' // Ensure no overflow
                                 }}
                             />
                             <div style={{
@@ -172,7 +172,8 @@ export default function HomeClient({ products, sellers }: { products: any[], sel
                                 height: '250px',
                                 borderRadius: '50%',
                                 background: 'rgba(255,255,255,0.1)',
-                                position: 'absolute'
+                                position: 'absolute',
+                                maxWidth: '90%'
                             }}></div>
 
                             {/* Floating Card 1 */}
@@ -181,8 +182,8 @@ export default function HomeClient({ products, sellers }: { products: any[], sel
                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                 className="glass-panel" style={{
                                     position: 'absolute',
-                                    top: '50px',
-                                    right: '50px',
+                                    top: '10%',
+                                    right: '10%',
                                     padding: '15px',
                                     background: 'white',
                                     color: '#333',
@@ -201,8 +202,8 @@ export default function HomeClient({ products, sellers }: { products: any[], sel
                                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                                 className="glass-panel" style={{
                                     position: 'absolute',
-                                    bottom: '60px',
-                                    left: '60px',
+                                    bottom: '10%',
+                                    left: '10%',
                                     padding: '15px',
                                     background: 'white',
                                     color: '#333',
@@ -224,10 +225,10 @@ export default function HomeClient({ products, sellers }: { products: any[], sel
 
             {/* Marketplace Section */}
             <section id="marketplace" style={{ paddingBottom: '4rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '2rem' }}>
+                <div className={styles.marketplaceLayout}>
 
                     {/* Sidebar Filters */}
-                    <aside>
+                    <aside className={styles.sidebar}>
                         <div className="glass-panel" style={{ padding: '1.5rem', position: 'sticky', top: '100px' }}>
                             <h3 style={{ marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>Explore</h3>
 

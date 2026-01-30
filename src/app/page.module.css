@@ -112,6 +112,74 @@
   margin-bottom: 0.5rem;
 }
 
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.heroVisualContainer {
+  position: relative;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.marketplaceLayout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+}
+
+.sidebar {
+  /* Sidebar styles if needed */
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 900px) {
+  .heroTitle {
+    font-size: 2.5rem !important; /* Override inline if necessary or applied via class */
+  }
+}
+
+@media (max-width: 768px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .heroVisualContainer {
+    height: 300px; /* Smaller height on mobile */
+    /* Optionally hide complex visual on very small screens or just stack */
+  }
+
+  /* Show visual but scaled? Let's hide for simplicity or stack it */
+  /* Actually, let's keep it but stack it */
+  .heroVisualContainer {
+      display: flex;
+      order: -1; /* visual on top? or bottom? */
+      margin-bottom: 2rem;
+  }
+  
+  .marketplaceLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: relative !important;
+    top: 0 !important;
+    margin-bottom: 2rem;
+  }
+  
+  .hero {
+      padding: 2rem 1rem;
+  }
+}
+
 /* Specific for features */
 .featureGrid {
   display: grid;

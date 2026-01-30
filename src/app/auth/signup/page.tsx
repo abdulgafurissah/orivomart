@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { registerSeller } from '@/app/actions/seller-signup';
 
+import styles from './signup.module.css';
+
 export default function SellerSignup() {
     const [formData, setFormData] = useState({
         details: '',
@@ -56,109 +58,109 @@ export default function SellerSignup() {
     };
 
     return (
-        <div className="container" style={{ minHeight: 'calc(100vh - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
-            <div className="glass-panel" style={{ width: '100%', maxWidth: '800px', padding: '2.5rem' }}>
-                <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', textAlign: 'center' }}>Become a Seller</h2>
-                Join OrivoMart today.
+        <div className={`container ${styles.container}`}>
+            <div className={`glass-panel ${styles.formPanel}`}>
+                <h2 className={styles.title}>Become a Seller</h2>
+                <div className={styles.subtitle}>Join OrivoMart today.</div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                <form onSubmit={handleSubmit} className={styles.formGrid}>
 
                     {/* Basic Info */}
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>Shop Details</h3>
+                    <div className={styles.fullWidth}>
+                        <h3 className={styles.sectionTitle}>Shop Details</h3>
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Shop Name</label>
+                        <label className={styles.label}>Shop Name</label>
                         <input required type="text" placeholder="e.g. Tech World" value={formData.shopName} onChange={(e) => setFormData({ ...formData, shopName: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                            className={styles.input} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Owner Full Name</label>
+                        <label className={styles.label}>Owner Full Name</label>
                         <input required type="text" placeholder="Your Full Name" value={formData.ownerName} onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                            className={styles.input} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Email Address</label>
+                        <label className={styles.label}>Email Address</label>
                         <input required type="email" placeholder="you@example.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                            className={styles.input} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Password</label>
+                        <label className={styles.label}>Password</label>
                         <input required type="password" placeholder="Create a password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                            className={styles.input} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Phone Number</label>
+                        <label className={styles.label}>Phone Number</label>
                         <input required type="text" placeholder="024XXXXXXX" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                            className={styles.input} />
                     </div>
 
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Shop Logo / Cover Image</label>
+                    <div className={styles.fullWidth}>
+                        <label className={styles.label}>Shop Logo / Cover Image</label>
                         <input type="file" accept="image/*" onChange={(e) => setShopImageFile(e.target.files ? e.target.files[0] : null)}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>This image will be displayed on the public shops page.</p>
+                            className={styles.input} style={{ padding: '8px' }} />
+                        <p className={styles.helperText}>This image will be displayed on the public shops page.</p>
                     </div>
 
                     {/* KYC Info */}
-                    <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-                        <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>Security & KYC</h3>
+                    <div className={styles.fullWidth} style={{ marginTop: '1rem' }}>
+                        <h3 className={styles.sectionTitle}>Security & KYC</h3>
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Home Address</label>
+                        <label className={styles.label}>Home Address</label>
                         <input required type="text" placeholder="House No, Street Name" value={formData.homeAddress} onChange={(e) => setFormData({ ...formData, homeAddress: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                            className={styles.input} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Business Address</label>
+                        <label className={styles.label}>Business Address</label>
                         <input required type="text" placeholder="Office Location" value={formData.businessAddress} onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                            className={styles.input} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Business Registration Number</label>
+                        <label className={styles.label}>Business Registration Number</label>
                         <input required type="text" placeholder="e.g. BN12345678" value={formData.businessRegNum} onChange={(e) => setFormData({ ...formData, businessRegNum: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                            className={styles.input} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Ghana Card Number</label>
+                        <label className={styles.label}>Ghana Card Number</label>
                         <input required type="text" placeholder="GHA-XXXXXXXXX-X" value={formData.ghanaCardNum} onChange={(e) => setFormData({ ...formData, ghanaCardNum: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                            className={styles.input} />
                     </div>
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>GPS Address</label>
+                    <div className={styles.fullWidth}>
+                        <label className={styles.label}>GPS Address</label>
                         <input required type="text" placeholder="GA-123-4567" value={formData.gpsAddress} onChange={(e) => setFormData({ ...formData, gpsAddress: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                            className={styles.input} />
                     </div>
 
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Business Certificate / ID (Image/PDF)</label>
+                    <div className={styles.fullWidth}>
+                        <label className={styles.label}>Business Certificate / ID (Image/PDF)</label>
                         <input type="file" accept="image/*,.pdf" onChange={(e) => setKycFile(e.target.files ? e.target.files[0] : null)}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Upload your Business Registration Certificate or Ghana Card image.</p>
+                            className={styles.input} style={{ padding: '8px' }} />
+                        <p className={styles.helperText}>Upload your Business Registration Certificate or Ghana Card image.</p>
                     </div>
 
                     {/* Payment Info */}
-                    <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-                        <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>Payout Account</h3>
+                    <div className={styles.fullWidth} style={{ marginTop: '1rem' }}>
+                        <h3 className={styles.sectionTitle}>Payout Account</h3>
                     </div>
 
-                    <div style={{ gridColumn: '1 / -1' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                    <div className={styles.fullWidth}>
+                        <div className={styles.paymentGrid}>
                             <select required value={formData.momoNetwork} onChange={(e) => setFormData({ ...formData, momoNetwork: e.target.value })}
-                                style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }}>
-                                <option value="MTN" style={{ color: 'black' }}>MTN Mobile Money</option>
-                                <option value="VOD" style={{ color: 'black' }}>Telecel Cash</option>
-                                <option value="ATL" style={{ color: 'black' }}>AirtelTigo Money</option>
+                                className={styles.input}>
+                                <option value="MTN">MTN Mobile Money</option>
+                                <option value="VOD">Telecel Cash</option>
+                                <option value="ATL">AirtelTigo Money</option>
                             </select>
                             <input required type="text" placeholder="Momo Number (024...)" value={formData.momoNumber} onChange={(e) => setFormData({ ...formData, momoNumber: e.target.value })}
-                                style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }} />
+                                className={styles.input} />
                         </div>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>* OrivoMart fee: 3% per transaction.</p>
+                        <p className={styles.helperText}>* OrivoMart fee: 3% per transaction.</p>
                     </div>
 
-                    <div style={{ gridColumn: '1 / -1', paddingTop: '1rem' }}>
+                    <div className={styles.fullWidth} style={{ paddingTop: '1rem' }}>
                         <button disabled={isLoading} type="submit" className="btn btn-primary" style={{ width: '100%', padding: '14px', fontSize: '1.1rem', opacity: isLoading ? 0.7 : 1 }}>
                             {isLoading ? 'Verifying...' : 'Submit Business Application'}
                         </button>

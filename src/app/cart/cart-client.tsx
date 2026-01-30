@@ -13,8 +13,14 @@ const PaystackButton = dynamic(() => import('react-paystack').then((mod) => mod.
     ssr: false,
 });
 
-export default function CartClient({ user }: { user: any }) {
+// ... (imports)
+
+export default function CartClient({ user, userProfile }: { user: any, userProfile?: any }) { // Added userProfile prop
     const { cart, removeFromCart, updateQuantity, total } = useCart();
+
+    // Check Trust Score
+    const trustScore = userProfile?.trustScore ?? 100; // Default to 100 if new/guest (or handle guest differnetly)
+    const isCodEligible = trustScore >= 50;
     const router = useRouter();
     const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 
@@ -263,18 +269,25 @@ export default function CartClient({ user }: { user: any }) {
                                     padding: '10px', borderRadius: '8px',
                                     border: paymentMethod === 'COD' ? '1px solid var(--primary)' : '1px solid var(--glass-border)',
                                     background: paymentMethod === 'COD' ? 'rgba(var(--primary-rgb), 0.1)' : 'transparent',
-                                    cursor: 'pointer'
+                                    cursor: isCodEligible ? 'pointer' : 'not-allowed',
+                                    opacity: isCodEligible ? 1 : 0.6
                                 }}>
                                     <input
                                         type="radio"
                                         name="paymentMethod"
                                         value="COD"
                                         checked={paymentMethod === 'COD'}
-                                        onChange={() => setPaymentMethod('COD')}
+                                        onChange={() => isCodEligible && setPaymentMethod('COD')}
+                                        disabled={!isCodEligible}
                                     />
                                     <div>
                                         <div style={{ fontWeight: 'bold' }}>Controlled Cash on Delivery</div>
                                         <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Pay {COMMITMENT_FEE_PERCENTAGE * 100}% now, verify item, pay rest on delivery.</div>
+                                        {!isCodEligible && (
+                                            <div style={{ color: '#e74c3c', fontSize: '0.75rem', marginTop: '4px' }}>
+                                                Unavailable: Low Trust Score ({trustScore}). Complete more online orders to unlock.
+                                            </div>
+                                        )}
                                     </div>
                                 </label>
                             </div>

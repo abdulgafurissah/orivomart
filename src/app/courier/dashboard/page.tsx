@@ -60,6 +60,20 @@ export default async function CourierDashboard() {
                                                 <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
                                                     {item.deliveryStatus.toUpperCase()}
                                                 </div>
+                                                {item.order && (item.order as any).isCod && (item.order as any).remainingBalance > 0 && item.deliveryStatus !== 'delivered_success' && (
+                                                    <div style={{
+                                                        marginTop: '8px',
+                                                        padding: '4px 8px',
+                                                        background: '#e67e22',
+                                                        color: 'white',
+                                                        borderRadius: '4px',
+                                                        fontSize: '0.8rem',
+                                                        fontWeight: 'bold',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        💰 Collect: GH₵ {Number((item.order as any).remainingBalance).toLocaleString()}
+                                                    </div>
+                                                )}
                                             </td>
                                         </tr>
                                     );

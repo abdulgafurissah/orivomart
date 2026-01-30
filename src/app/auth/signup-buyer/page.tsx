@@ -5,6 +5,8 @@ import Link from 'next/link';
 
 import { useRouter } from 'next/navigation';
 
+import styles from '../auth.module.css';
+
 export default function BuyerSignup() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -43,47 +45,47 @@ export default function BuyerSignup() {
     };
 
     return (
-        <div className="container" style={{ minHeight: 'calc(100vh - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
-            <div className="glass-panel" style={{ width: '100%', maxWidth: '450px', padding: '2.5rem' }}>
-                <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', textAlign: 'center' }}>Create Buyer Account</h2>
-                <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+        <div className={`container ${styles.container}`}>
+            <div className={`glass-panel ${styles.authPanel}`}>
+                <h2 className={styles.title}>Create Buyer Account</h2>
+                <p className={styles.subtitle}>
                     Join OrivoMart to buy fresh produce directly.
                 </p>
 
-                <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <form onSubmit={handleSignup} className={styles.form}>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Full Name</label>
+                        <label className={styles.label}>Full Name</label>
                         <input
                             required
                             type="text"
                             placeholder="John Doe"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }}
+                            className={styles.input}
                         />
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Email Address</label>
+                        <label className={styles.label}>Email Address</label>
                         <input
                             required
                             type="email"
                             placeholder="you@example.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }}
+                            className={styles.input}
                         />
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Password</label>
+                        <label className={styles.label}>Password</label>
                         <input
                             required
                             type="password"
                             placeholder="Create a strong password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }}
+                            className={styles.input}
                         />
                     </div>
 
@@ -92,12 +94,12 @@ export default function BuyerSignup() {
                     </button>
                 </form>
 
-                <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                <div className={styles.footer}>
                     <p>
-                        Already have an account? <Link href="/auth/signin" style={{ color: 'var(--primary)' }}>Sign In</Link>
+                        Already have an account? <Link href="/auth/signin" className={styles.linkPrimary}>Sign In</Link>
                     </p>
-                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--glass-border)' }}>
-                        <Link href="/auth/signup" style={{ color: 'var(--accent)' }}>Want to Sell on OrivoMart?</Link>
+                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--card-border)' }}>
+                        <Link href="/auth/signup" className={styles.linkAccent}>Want to Sell on OrivoMart?</Link>
                     </div>
                 </div>
             </div>

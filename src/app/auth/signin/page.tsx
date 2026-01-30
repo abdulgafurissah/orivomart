@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { login } from '@/app/actions/auth-actions';
 
+import styles from '../auth.module.css';
+
 export default function SignIn() {
     const [isLoading, setIsLoading] = useState(false);
 
@@ -19,33 +21,33 @@ export default function SignIn() {
     };
 
     return (
-        <div className="container" style={{ minHeight: 'calc(100vh - 80px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
-            <div className="glass-panel" style={{ width: '100%', maxWidth: '450px', padding: '2.5rem' }}>
-                <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', textAlign: 'center' }}>Welcome Back</h2>
-                <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+        <div className={`container ${styles.container}`}>
+            <div className={`glass-panel ${styles.authPanel}`}>
+                <h2 className={styles.title}>Welcome Back</h2>
+                <p className={styles.subtitle}>
                     Sign in to your OrivoMart account
                 </p>
 
-                <form action={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <form action={handleSubmit} className={styles.form}>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Email Address</label>
+                        <label className={styles.label}>Email Address</label>
                         <input
                             required
                             name="email"
                             type="email"
                             placeholder="you@example.com"
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }}
+                            className={styles.input}
                         />
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Password</label>
+                        <label className={styles.label}>Password</label>
                         <input
                             required
                             name="password"
                             type="password"
                             placeholder="••••••••"
-                            style={{ width: '100%', padding: '12px', borderRadius: 'var(--radius-sm)', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white' }}
+                            className={styles.input}
                         />
                     </div>
 
@@ -58,12 +60,12 @@ export default function SignIn() {
                     </button>
                 </form>
 
-                <div style={{ marginTop: '2rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-secondary)', borderTop: '1px solid var(--glass-border)', paddingTop: '1.5rem' }}>
+                <div className={styles.footer}>
                     <p style={{ marginBottom: '1rem' }}>
-                        New Seller? <Link href="/auth/signup" style={{ color: 'var(--primary)' }}>Start Selling</Link>
+                        New Seller? <Link href="/auth/signup" className={styles.linkPrimary}>Start Selling</Link>
                     </p>
                     <p>
-                        New Buyer? <Link href="/auth/signup-buyer" style={{ color: 'var(--accent)' }}>Create Buyer Account</Link>
+                        New Buyer? <Link href="/auth/signup-buyer" className={styles.linkAccent}>Create Buyer Account</Link>
                     </p>
                 </div>
             </div>

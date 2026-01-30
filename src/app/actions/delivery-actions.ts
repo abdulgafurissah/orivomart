@@ -131,3 +131,31 @@ export async function updateCourierDeliveryStatus(itemId: string, status: string
         return { error: e.message };
     }
 }
+export async function completeDelivery(itemId: string, otp: string) {
+    const session = await import('@/utils/session').then(m => m.getSession());
+    if (!session || session.role !== 'courier') return { error: 'Unauthorized' };
+
+    try {
+        const item = await prisma.orderItem.findUnique({
+            where: { id: itemId },
+            include: { order: true } // Need to check if whole order is done? 
+        });
+
+        if (!item) return { error: 'Item not found' };
+        if (item.courierId !== session.userId) return { error: 'Not assigned to you' };
+        if (item.deliveryOtp !== otp) return { error: 'Invalid OTP. Ask buyer for correct code.' };
+
+        // OTP Match!
+        await prisma.orderItem.update({
+            where: { id: itemId },
+            data: { deliveryStatus: 'delivered_success' }
+        });
+
+        const { revalidatePath } = await import('next/cache');
+        revalidatePath('/courier/dashboard');
+
+        return { success: true };
+    } catch (e: any) {
+        return { error: e.message };
+    }
+}

@@ -80,14 +80,31 @@ export default async function CustomerOrdersPage() {
                                         </div>
 
                                         <div style={{ textAlign: 'right' }}>
-                                            {item.trackingCode ? (
-                                                <Link href={`/track?q=${item.trackingCode}`} className="btn btn-secondary" style={{ fontSize: '0.9rem' }}>
-                                                    Track Package
-                                                </Link>
-                                            ) : (
-                                                <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-                                                    Processing...
-                                                </span>
+                                            {item.trackingCode && (
+                                                <div style={{ marginBottom: '0.5rem' }}>
+                                                    <Link href={`/track?q=${item.trackingCode}`} className="btn btn-secondary" style={{ fontSize: '0.9rem' }}>
+                                                        Track Package
+                                                    </Link>
+                                                </div>
+                                            )}
+
+                                            {/* Show OTP only if Out for Delivery and not yet delivered */}
+                                            {item.deliveryStatus === 'out_for_delivery' && item.deliveryOtp && (
+                                                <div style={{
+                                                    padding: '8px',
+                                                    background: 'rgba(243, 156, 18, 0.15)',
+                                                    border: '1px solid #f39c12',
+                                                    borderRadius: '8px',
+                                                    textAlign: 'center'
+                                                }}>
+                                                    <div style={{ fontSize: '0.75rem', color: '#f39c12', fontWeight: 'bold' }}>DELIVERY CODE</div>
+                                                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '2px', color: '#e67e22' }}>
+                                                        {item.deliveryOtp}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                                                        Share with rider on arrival
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
                                     </div>

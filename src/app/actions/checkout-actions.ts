@@ -70,7 +70,8 @@ export async function createOrder(data: OrderInput) {
                     sellerId: item.sellerId,
                     // Note: 'item.sellerId' assumed to be in cart item from mock/db product
                     deliveryStatus: 'pending_pickup',
-                    trackingCode: `TRK-${Math.floor(100000 + Math.random() * 900000)}`
+                    trackingCode: `TRK-${Math.floor(100000 + Math.random() * 900000)}`,
+                    deliveryOtp: Math.floor(100000 + Math.random() * 900000).toString() // Generate 6-digit OTP
                 }
             });
 

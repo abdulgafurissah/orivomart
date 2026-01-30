@@ -21,6 +21,23 @@ export default function CartClient({ user }: { user: any }) {
     const [subaccountCode, setSubaccountCode] = useState<string | null>(null);
     const [isVerifying, setIsVerifying] = useState(false);
 
+    // Shipping State
+    const [shippingInfo, setShippingInfo] = useState({
+        email: '',
+        name: '',
+        phone: '',
+        address: '',
+        gpsAddress: ''
+    });
+
+    // Payment State
+    const [paymentMethod, setPaymentMethod] = useState<'ONLINE' | 'COD'>('ONLINE');
+    const COMMITMENT_FEE_PERCENTAGE = 0.15; // 15% commitment fee
+
+    const commitmentFee = Math.ceil(total * COMMITMENT_FEE_PERCENTAGE);
+    const amountToPay = paymentMethod === 'ONLINE' ? total : commitmentFee;
+    const balanceToPay = paymentMethod === 'ONLINE' ? 0 : total - commitmentFee;
+
     const handleVerifyGps = async () => {
         if (!shippingInfo.gpsAddress) {
             alert("Please enter a GPS address first");
@@ -76,15 +93,6 @@ export default function CartClient({ user }: { user: any }) {
         }
     }, [cart]);
 
-
-    const [shippingInfo, setShippingInfo] = useState({
-        email: '',
-        name: '',
-        phone: '',
-        address: '',
-        gpsAddress: ''
-    });
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setShippingInfo(prev => ({ ...prev, [name]: value }));
@@ -94,12 +102,13 @@ export default function CartClient({ user }: { user: any }) {
 
     const componentProps = {
         email: shippingInfo.email,
-        amount: total * 100,
+        amount: amountToPay * 100,
         publicKey,
-        text: "Pay Now",
+        text: paymentMethod === 'ONLINE' ? `Pay Full Amount (GH₵ ${amountToPay.toLocaleString()})` : `Pay Commitment Fee (GH₵ ${amountToPay.toLocaleString()})`,
         subaccount: subaccountCode || undefined,
         metadata: {
             custom_fields: [
+                { display_name: "Payment Method", variable_name: "payment_method", value: paymentMethod },
                 { display_name: "Customer Name", variable_name: "customer_name", value: shippingInfo.name },
                 { display_name: "Phone", variable_name: "phone", value: shippingInfo.phone },
                 { display_name: "Address", variable_name: "address", value: shippingInfo.address },
@@ -113,15 +122,15 @@ export default function CartClient({ user }: { user: any }) {
                 cart,
                 shippingInfo,
                 paymentReference: reference.reference,
-                total
+                total,
+                paymentMethod,
+                commitmentFeePaid: paymentMethod === 'COD' ? commitmentFee : undefined
             });
 
             if (result.success) {
-                alert("Payment successful! Order #" + result.orderId);
-                // Clear local cart
-                // We need to access clearCart from context. But wait, I destructured it? 
-                // Ah, I need to add clearCart to destructuring at top of component.
-                // Assuming it's available.
+                alert(paymentMethod === 'ONLINE'
+                    ? "Payment successful! Order #" + result.orderId
+                    : "Commitment Fee Paid! Order #" + result.orderId + ". Please pay balance on delivery.");
                 window.location.href = '/orders'; // Redirect to orders page
             } else {
                 alert("Payment successful but failed to save order: " + result.error);
@@ -224,13 +233,74 @@ export default function CartClient({ user }: { user: any }) {
                 <div className={styles.cartSummary}>
                     <div className="glass-panel" style={{ padding: '2rem', position: 'sticky', top: '100px' }}>
                         <h3 style={{ marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>Order Summary</h3>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+
+                        {/* Payment Method Selector */}
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Payment Method</label>
+                            <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
+                                <label style={{
+                                    display: 'flex', alignItems: 'center', gap: '8px',
+                                    padding: '10px', borderRadius: '8px',
+                                    border: paymentMethod === 'ONLINE' ? '1px solid var(--primary)' : '1px solid var(--glass-border)',
+                                    background: paymentMethod === 'ONLINE' ? 'rgba(var(--primary-rgb), 0.1)' : 'transparent',
+                                    cursor: 'pointer'
+                                }}>
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="ONLINE"
+                                        checked={paymentMethod === 'ONLINE'}
+                                        onChange={() => setPaymentMethod('ONLINE')}
+                                    />
+                                    <div>
+                                        <div style={{ fontWeight: 'bold' }}>Pay Full Online</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Fastest processing. 100% Secure.</div>
+                                    </div>
+                                </label>
+
+                                <label style={{
+                                    display: 'flex', alignItems: 'center', gap: '8px',
+                                    padding: '10px', borderRadius: '8px',
+                                    border: paymentMethod === 'COD' ? '1px solid var(--primary)' : '1px solid var(--glass-border)',
+                                    background: paymentMethod === 'COD' ? 'rgba(var(--primary-rgb), 0.1)' : 'transparent',
+                                    cursor: 'pointer'
+                                }}>
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value="COD"
+                                        checked={paymentMethod === 'COD'}
+                                        onChange={() => setPaymentMethod('COD')}
+                                    />
+                                    <div>
+                                        <div style={{ fontWeight: 'bold' }}>Controlled Cash on Delivery</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Pay {COMMITMENT_FEE_PERCENTAGE * 100}% now, verify item, pay rest on delivery.</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                             <span>Subtotal</span>
                             <span>GH₵ {total.toLocaleString()}</span>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', fontWeight: 'bold', fontSize: '1.2rem' }}>
-                            <span>Total</span>
-                            <span style={{ color: 'var(--primary)' }}>GH₵ {total.toLocaleString()}</span>
+
+                        {paymentMethod === 'COD' && (
+                            <>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#f39c12' }}>
+                                    <span>Commitment Fee (15%)</span>
+                                    <span>GH₵ {commitmentFee.toLocaleString()}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: '#2ecc71' }}>
+                                    <span>Pay on Delivery</span>
+                                    <span>GH₵ {balanceToPay.toLocaleString()}</span>
+                                </div>
+                            </>
+                        )}
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', fontWeight: 'bold', fontSize: '1.2rem', borderTop: '1px solid var(--glass-border)', paddingTop: '1rem' }}>
+                            <span>Total to Pay Now</span>
+                            <span style={{ color: 'var(--primary)' }}>GH₵ {amountToPay.toLocaleString()}</span>
                         </div>
 
                         <div style={{ width: '100%' }}>

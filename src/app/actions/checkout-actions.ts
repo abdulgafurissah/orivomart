@@ -16,31 +16,39 @@ type OrderInput = {
     };
     paymentReference: string;
     total: number;
+    paymentMethod: 'ONLINE' | 'COD'; // Added
+    commitmentFeePaid?: number;      // Added
 };
 
 export async function createOrder(data: OrderInput) {
     // 1. Validate Session (Optional: guest checkout allowed?)
-    // Assuming mostly logged in, but let's handle guest by checking session
     const session = await getSession();
     const buyerId = session ? session.userId : null;
 
-    const { cart, shippingInfo, paymentReference, total } = data;
+    const { cart, shippingInfo, paymentReference, total, paymentMethod } = data; // Destructure new fields
 
     if (!cart || cart.length === 0) return { error: 'Empty cart' };
 
     try {
         // 2. Create the Order
-        // Note: For multi-vendor, we might want to split orders or keep them under one Order but many Items.
-        // The Prisma schema allows one Order to have many Items from different Sellers.
+        // Determine status and financial fields based on payment method
+        const isCod = paymentMethod === 'COD';
+        const status = isCod ? 'cod_commitment_paid' : 'fully_paid';
+        const commitmentFee = isCod ? (data.commitmentFeePaid || 0) : 0;
+        const remainingBalance = isCod ? (total - commitmentFee) : 0;
 
         const order = await prisma.order.create({
             data: {
                 buyerId,
                 totalAmount: total,
                 currency: 'GHS',
-                status: 'paid', // Assuming Paystack success before calling this
+                status: status,
                 paymentReference,
                 shippingDetails: shippingInfo,
+                paymentMethod,      // Save method
+                isCod,              // Save flag
+                commitmentFee,      // Save fee
+                remainingBalance    // Save balance
             }
         });
 
@@ -90,6 +98,7 @@ export async function createOrder(data: OrderInput) {
 
         // 5. Send Notification to Buyer
         if (shippingInfo.email) {
+            // Updated email content might be needed for COD instructions, but keeping generic for now
             sendBuyerOrderConfirmation(
                 shippingInfo.email,
                 shippingInfo.name,

@@ -27,6 +27,8 @@ model Profile {
   currentLng          Float?    @map("current_lng")
   lastLocationUpdate  DateTime? @map("last_location_update")
   
+  trustScore          Int      @default(100) @map("trust_score")
+
   // Relations
   seller    Seller?
   orders    Order[]  @relation("BuyerOrders")
@@ -34,7 +36,6 @@ model Profile {
   
   @@map("profiles")
 }
-
 // --------------------------------------------------------
 // SELLERS
 // --------------------------------------------------------
@@ -101,9 +102,6 @@ model Product {
   @@map("products")
 }
 
-// --------------------------------------------------------
-// ORDERS
-// --------------------------------------------------------
 model Order {
   id               String   @id @default(uuid())
   buyerId          String?  @map("buyer_id")
@@ -111,8 +109,15 @@ model Order {
   
   totalAmount      Decimal  @map("total_amount")
   currency         String   @default("GHS")
-  status           String   @default("pending") // pending, paid, failed
+  status           String   @default("pending") // pending, fully_paid, cod_commitment_paid, delivered_success, failed_delivery, cancelled
   paymentReference String?  @map("payment_reference")
+  
+  // Payment Workflow
+  paymentMethod    String   @default("ONLINE") @map("payment_method") // ONLINE, COD
+  isCod            Boolean  @default(false) @map("is_cod")
+  commitmentFee    Decimal  @default(0) @map("commitment_fee")
+  remainingBalance Decimal  @default(0) @map("remaining_balance")
+  
   shippingDetails  Json?    @map("shipping_details")
   
   items            OrderItem[]

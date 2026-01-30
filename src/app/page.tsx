@@ -1,5 +1,6 @@
 
 import { getPublicProducts, getPublicSellers } from './actions/public-actions';
+import { getCategories } from './actions/category-actions';
 import { getSession } from '@/utils/session';
 import HomeClient from './home-client';
 
@@ -8,6 +9,7 @@ export const dynamic = 'force-dynamic';
 export default async function Home() {
   const products = await getPublicProducts();
   const sellers = await getPublicSellers();
+  const categories = await getCategories();
   const session = await getSession();
 
   const jsonLd = {
@@ -52,7 +54,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
       />
-      <HomeClient products={products} sellers={sellers} user={session} />
+      <HomeClient products={products} sellers={sellers} user={session} categories={categories} />
     </>
   );
 }

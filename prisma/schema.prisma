@@ -72,6 +72,15 @@ model Product {
   @@map("products")
 }
 
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  image     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("categories")
+}
+
 model Order {
   id               String      @id @default(uuid())
   buyerId          String?     @map("buyer_id")

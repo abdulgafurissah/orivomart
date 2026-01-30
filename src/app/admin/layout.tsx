@@ -18,6 +18,7 @@ export default async function AdminLayout({
     // Admin Sidebar Links
     const links = [
         { label: 'Overview', href: '/admin/dashboard', icon: '📊' },
+        { label: 'Categories', href: '/admin/categories', icon: '📂' },
         { label: 'Manage Sellers', href: '/admin/sellers', icon: '🏪' },
         { label: 'Manage Users', href: '/admin/users', icon: '👥' },
         { label: 'Transactions', href: '/admin/transactions', icon: '💳' },

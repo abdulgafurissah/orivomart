@@ -7,9 +7,13 @@ import styles from './page.module.css';
 import { FadeIn, SlideIn, StaggerContainer, StaggerItem } from '@/components/Animations';
 import { motion } from 'framer-motion';
 
-const categories = ['All', 'electronics', 'clothing', 'home', 'beauty', 'sports', 'toys', 'groceries', 'books'];
 
-export default function HomeClient({ products, sellers, user }: { products: any[], sellers: any[], user: any }) {
+
+export default function HomeClient({ products, sellers, user, categories: dbCategories = [] }: { products: any[], sellers: any[], user: any, categories?: any[] }) {
+    const categoryNames = ['All', ...dbCategories.map(c => c.name)];
+    /* Fallback if DB is empty? Maybe not needed if admin adds them. */
+    const categories = categoryNames.length > 1 ? categoryNames : ['All', 'electronics', 'clothing', 'home', 'beauty', 'sports', 'toys', 'groceries', 'books'];
+
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
     const { addToCart } = useCart();

@@ -139,6 +139,11 @@
   /* Sidebar styles if needed */
 }
 
+.mobileCategoryDropdown {
+  display: none;
+  /* Hidden by default on desktop */
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 900px) {
   .heroTitle {
@@ -154,18 +159,8 @@
   }
 
   .heroVisualContainer {
-    height: 300px;
-    /* Smaller height on mobile */
-    /* Optionally hide complex visual on very small screens or just stack */
-  }
-
-  /* Show visual but scaled? Let's hide for simplicity or stack it */
-  /* Actually, let's keep it but stack it */
-  .heroVisualContainer {
-    display: flex;
-    order: -1;
-    /* visual on top? or bottom? */
-    margin-bottom: 2rem;
+    display: none !important;
+    /* Hide visual on mobile to make hero small */
   }
 
   .marketplaceLayout {
@@ -173,16 +168,21 @@
   }
 
   .sidebar {
-    position: relative !important;
-    top: 0 !important;
+    display: none;
+    /* Hide sidebar list on mobile */
+  }
+
+  .mobileCategoryDropdown {
+    display: block;
+    /* Show dropdown on mobile */
     margin-bottom: 2rem;
   }
 
   .hero {
-    padding: 6rem 1rem 2rem 1rem !important;
-    /* Top padding to account for fixed navbar + breathing room */
+    padding: 5rem 1rem 1rem 1rem !important;
+    /* Compact header */
     min-height: auto !important;
-    /* Let content dictate height, don't force 80vh which is huge */
+    margin-bottom: 1rem !important;
   }
 }
 

@@ -227,7 +227,43 @@ export default function HomeClient({ products, sellers }: { products: any[], sel
             <section id="marketplace" style={{ paddingBottom: '4rem' }}>
                 <div className={styles.marketplaceLayout}>
 
-                    {/* Sidebar Filters */}
+                    {/* Mobile Category Dropdown (Visible only on mobile) */}
+                    <div className={styles.mobileCategoryDropdown}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Select Category</label>
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                border: '1px solid var(--card-border)',
+                                fontSize: '1rem',
+                                background: 'white'
+                            }}
+                        >
+                            {categories.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                        <div style={{ marginTop: '1rem' }}>
+                            <input
+                                type="text"
+                                placeholder="Search products..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--card-border)',
+                                    background: 'white'
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Sidebar Filters (Desktop Only) */}
                     <aside className={styles.sidebar}>
                         <div className="glass-panel" style={{ padding: '1.5rem', position: 'sticky', top: '100px' }}>
                             <h3 style={{ marginBottom: '1rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>Explore</h3>

@@ -42,7 +42,15 @@ interface MapProps {
 export default function Map({ courierPos, destPos }: MapProps) {
     // Default center (e.g., Accra, Ghana) if no positions
     const defaultCenter: [number, number] = [5.6037, -0.1870];
-    const center = courierPos ? [courierPos.lat, courierPos.lng] : (destPos ? [destPos.lat, destPos.lng] : defaultCenter) as [number, number];
+
+    // Explicitly type LatLngTuple
+    let center: [number, number] = defaultCenter;
+
+    if (courierPos) {
+        center = [courierPos.lat, courierPos.lng];
+    } else if (destPos) {
+        center = [destPos.lat, destPos.lng];
+    }
 
     return (
         <MapContainer

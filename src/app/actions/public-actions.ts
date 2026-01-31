@@ -24,11 +24,16 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
 
 // Robust deep serializer
 // Robust deep serializer using JSON to ensure plain objects
+// Robust deep serializer using JSON to ensure plain objects
 function serialize<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj, (key, value) => {
         // Handle Decimal conversion safely during stringification
-        if (typeof value === 'object' && value !== null && (value.type === 'Decimal' || (value.constructor && value.constructor.name === 'Decimal') || ('s' in value && 'e' in value && 'd' in value))) {
-            return Number(value);
+        if (typeof value === 'object' && value !== null) {
+             // Prisma Decimals often identify by constructor name or internal structure
+            if ((value.constructor && value.constructor.name === 'Decimal') || 
+                ('s' in value && 'e' in value && 'd' in value)) {
+                return Number(value);
+            }
         }
         return value;
     }));

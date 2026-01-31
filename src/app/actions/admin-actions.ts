@@ -63,9 +63,21 @@ export async function deleteSeller(sellerId: string) {
     if (!session || session.role !== 'admin') return { error: 'Unauthorized' };
 
     try {
-        await prisma.seller.delete({
-            where: { id: sellerId }
+        const seller = await prisma.seller.findUnique({
+            where: { id: sellerId },
+            select: { userId: true }
         });
+
+        if (seller && seller.userId) {
+            await prisma.profile.delete({
+                where: { id: seller.userId }
+            });
+        } else {
+            // Fallback if no user linked (edge case) or just clean up seller
+            await prisma.seller.delete({
+                where: { id: sellerId }
+            });
+        }
         return { success: true };
     } catch (e: any) {
         return { error: e.message };

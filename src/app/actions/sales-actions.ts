@@ -14,8 +14,23 @@ export async function getSellerSales() {
     if (!seller) return [];
 
     // Fetch items sold by this seller
-    const sales = await prisma.orderItem.findMany({
+    // robustness: also check for Items where sellerId might be missing but productId belongs to seller
+    const sellerProducts = await prisma.product.findMany({
         where: { sellerId: seller.id },
+        select: { id: true }
+    });
+    const productIds = sellerProducts.map(p => p.id);
+
+    const sales = await prisma.orderItem.findMany({
+        where: {
+            OR: [
+                { sellerId: seller.id },
+                {
+                    sellerId: null,
+                    productId: { in: productIds }
+                }
+            ]
+        },
         include: {
             order: {
                 select: {

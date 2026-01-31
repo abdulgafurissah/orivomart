@@ -29,8 +29,8 @@ function serialize<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj, (key, value) => {
         // Handle Decimal conversion safely during stringification
         if (typeof value === 'object' && value !== null) {
-             // Prisma Decimals often identify by constructor name or internal structure
-            if ((value.constructor && value.constructor.name === 'Decimal') || 
+            // Prisma Decimals often identify by constructor name or internal structure
+            if ((value.constructor && value.constructor.name === 'Decimal') ||
                 ('s' in value && 'e' in value && 'd' in value)) {
                 return Number(value);
             }
@@ -39,10 +39,34 @@ function serialize<T>(obj: T): T {
     }));
 }
 
-export async function getPublicProducts() {
+export async function getPublicProducts(options?: {
+    page?: number;
+    limit?: number;
+    category?: string;
+    search?: string;
+}) {
+    const { page = 1, limit = 50, category, search } = options || {};
+    const skip = (page - 1) * limit;
+
     try {
+        const where: any = { status: 'active' };
+
+        if (category && category !== 'All') {
+            where.category = {
+                equals: category,
+                mode: 'insensitive'
+            };
+        }
+
+        if (search) {
+            where.name = {
+                contains: search,
+                mode: 'insensitive'
+            };
+        }
+
         const products = await withRetry(() => prisma.product.findMany({
-            where: { status: 'active' },
+            where,
             include: {
                 seller: {
                     select: {
@@ -53,7 +77,9 @@ export async function getPublicProducts() {
                     }
                 }
             },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: limit
         }));
 
         return serialize(products);

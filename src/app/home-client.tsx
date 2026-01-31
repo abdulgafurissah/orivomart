@@ -1,31 +1,97 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import styles from './page.module.css';
 import { FadeIn, SlideIn, StaggerContainer, StaggerItem } from '@/components/Animations';
 import { motion } from 'framer-motion';
+import { getPublicProducts } from './actions/public-actions';
 
+// Simple debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+    return debouncedValue;
+}
 
-
-export default function HomeClient({ products, sellers, user, categories: dbCategories = [] }: { products: any[], sellers: any[], user: any, categories?: any[] }) {
+export default function HomeClient({ products: initialProducts, sellers, user, categories: dbCategories = [] }: { products: any[], sellers: any[], user: any, categories?: any[] }) {
     const categoryNames = ['All', ...dbCategories.map(c => c.name)];
-    /* Fallback if DB is empty? Maybe not needed if admin adds them. */
+    /* Fallback if DB is empty */
     const categories = categoryNames.length > 1 ? categoryNames : ['All', 'electronics', 'clothing', 'home', 'beauty', 'sports', 'toys', 'groceries', 'books'];
 
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [searchQuery, setSearchQuery] = useState('');
+    const debouncedSearch = useDebounce(searchQuery, 500);
+
+    const [products, setProducts] = useState<any[]>(initialProducts);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
+
+    // Track if this is the initial mount to avoid double fetching if initialProducts are already correct
+    const isFirstRun = useRef(true);
+
     const { addToCart } = useCart();
 
-    const filteredProducts = useMemo(() => {
-        return products.filter((product) => {
-            const productCategory = product.category || 'All';
-            const matchesCategory = selectedCategory === 'All' || productCategory.toLowerCase() === selectedCategory.toLowerCase();
-            const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-            return matchesCategory && matchesSearch;
-        });
-    }, [selectedCategory, searchQuery, products]);
+    const fetchProducts = useCallback(async (reset: boolean = false) => {
+        setLoading(true);
+        try {
+            const nextPage = reset ? 1 : page + 1;
+            const newProducts = await getPublicProducts({
+                page: nextPage,
+                limit: 20,
+                category: selectedCategory === 'All' ? undefined : selectedCategory,
+                search: debouncedSearch || undefined
+            });
+
+            if (reset) {
+                setProducts(newProducts);
+                setPage(1);
+            } else {
+                setProducts(prev => [...prev, ...newProducts]);
+                setPage(nextPage);
+            }
+
+            // If we got fewer than limit, we reached the end
+            if (newProducts.length < 20) {
+                setHasMore(false);
+            } else {
+                setHasMore(true);
+            }
+        } catch (error) {
+            console.error("Failed to fetch products", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [selectedCategory, debouncedSearch, page]);
+
+    // Effect for filtering/searching
+    useEffect(() => {
+        if (isFirstRun.current) {
+            isFirstRun.current = false;
+            // If initial state matches what we want, don't fetch. 
+            // However, initialProducts are "All" and "No Search".
+            // If user selects category, we must fetch.
+            return;
+        }
+
+        // Reset and fetch
+        fetchProducts(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCategory, debouncedSearch]);
+
+    const handleLoadMore = () => {
+        fetchProducts(false);
+    };
 
     const handleAddToCart = (product: any) => {
         // Map DB product to CartItem safely
@@ -70,7 +136,7 @@ export default function HomeClient({ products, sellers, user, categories: dbCate
 
                     <div className={styles.heroGrid}>
                         {/* Left Content */}
-                        <div className="animate-fade-in" style={{ textAlign: 'left' }}> {/* Keep text align left on desktop, mobile can override via CSS if needed, but flex-col usually wants centered or left. CSS has text-align: center for mobile */}
+                        <div className="animate-fade-in" style={{ textAlign: 'left' }}>
                             <SlideIn delay={0.2}>
                                 <span style={{
                                     background: 'rgba(255,255,255,0.2)',
@@ -90,7 +156,6 @@ export default function HomeClient({ products, sellers, user, categories: dbCate
                                     lineHeight: '1.2',
                                     marginBottom: '1.5rem',
                                     fontWeight: '800'
-                                    /* fontSize moved to CSS */
                                 }}>
                                     Shopping Made <br />
                                     <span style={{ color: '#ffd166' }}>Simple & Joyful</span>
@@ -170,7 +235,7 @@ export default function HomeClient({ products, sellers, user, categories: dbCate
                                     borderRadius: '50%',
                                     border: '2px dashed rgba(255,255,255,0.2)',
                                     position: 'absolute',
-                                    maxWidth: '100%' // Ensure no overflow
+                                    maxWidth: '100%'
                                 }}
                             />
                             <div style={{
@@ -328,11 +393,13 @@ export default function HomeClient({ products, sellers, user, categories: dbCate
                             <h2 style={{ fontSize: '1.5rem' }}>
                                 {selectedCategory === 'All' ? 'Trending Products' : `Browsing ${selectedCategory}`}
                             </h2>
-                            <span style={{ color: 'var(--text-secondary)' }}>{filteredProducts.length} items found</span>
+                            <span style={{ color: 'var(--text-secondary)' }}>
+                                {products.length} {hasMore ? '+' : ''} items
+                            </span>
                         </div>
 
                         <StaggerContainer className="product-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '2rem' }}>
-                            {filteredProducts.map((product) => {
+                            {products.map((product) => {
                                 const shop = product.seller;
                                 const shopName = shop?.shopName || 'Unknown Shop';
                                 const shopId = shop?.id;
@@ -345,12 +412,14 @@ export default function HomeClient({ products, sellers, user, categories: dbCate
                                             style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', height: '100%' }}
                                         >
                                             <div style={{ height: '200px', background: '#eee', position: 'relative', overflow: 'hidden' }}>
-                                                <motion.img
-                                                    whileHover={{ scale: 1.1 }}
-                                                    transition={{ duration: 0.3 }}
+                                                {/* Optimized Next.js Image with lazy load */}
+                                                <Image
                                                     src={product.image || 'https://via.placeholder.com/200'}
                                                     alt={product.name}
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    fill
+                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                    style={{ objectFit: 'cover' }}
+                                                    className="transition-transform duration-300 hover:scale-110" // Simple hover effect
                                                 />
                                                 <span style={{
                                                     position: 'absolute',
@@ -361,7 +430,8 @@ export default function HomeClient({ products, sellers, user, categories: dbCate
                                                     borderRadius: '4px',
                                                     fontSize: '0.8rem',
                                                     textTransform: 'capitalize',
-                                                    color: 'white'
+                                                    color: 'white',
+                                                    zIndex: 10
                                                 }}>
                                                     {product.category || 'General'}
                                                 </span>
@@ -398,7 +468,46 @@ export default function HomeClient({ products, sellers, user, categories: dbCate
                             })}
                         </StaggerContainer>
 
-                        {filteredProducts.length === 0 && (
+                        {/* Load More / Loading State */}
+                        <div style={{ marginTop: '3rem', textAlign: 'center' }}>
+                            {loading && (
+                                <div style={{ display: 'inline-block', padding: '1rem' }}>
+                                    <div className="spinner" style={{
+                                        width: '40px',
+                                        height: '40px',
+                                        borderRadius: '50%',
+                                        border: '4px solid rgba(0,0,0,0.1)',
+                                        borderTopColor: 'var(--primary)',
+                                        animation: 'spin 1s linear infinite'
+                                    }}></div>
+                                    <style jsx>{`
+                                        @keyframes spin { to { transform: rotate(360deg); } }
+                                    `}</style>
+                                </div>
+                            )}
+
+                            {!loading && hasMore && products.length > 0 && (
+                                <button
+                                    onClick={handleLoadMore}
+                                    style={{
+                                        padding: '12px 30px',
+                                        fontSize: '1rem',
+                                        background: 'var(--card-bg)',
+                                        border: '1px solid var(--card-border)',
+                                        borderRadius: '30px',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+                                        transition: 'all 0.2s'
+                                    }}
+                                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                >
+                                    Load More Products
+                                </button>
+                            )}
+                        </div>
+
+                        {!loading && products.length === 0 && (
                             <FadeIn>
                                 <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '4rem', color: 'var(--text-secondary)' }}>
                                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔍</div>

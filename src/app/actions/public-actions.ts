@@ -89,11 +89,16 @@ export async function getPublicProducts(options?: {
     }
 }
 
-export async function getPublicSellers() {
+export async function getPublicSellers(options?: { page?: number; limit?: number }) {
+    const { page = 1, limit = 20 } = options || {};
+    const skip = (page - 1) * limit;
+
     try {
         const sellers = await withRetry(() => prisma.seller.findMany({
             where: { status: 'active', verified: true },
             orderBy: { rating: 'desc' },
+            take: limit,
+            skip: skip,
             include: {
                 products: {
                     where: { status: 'active' },

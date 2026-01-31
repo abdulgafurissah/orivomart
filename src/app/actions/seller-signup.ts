@@ -4,41 +4,7 @@ import { prisma } from '@/utils/prisma';
 import bcrypt from 'bcryptjs';
 import { createSession } from '@/utils/session';
 
-// Cloudflare R2 / S3 Compatible Upload Helper
-async function uploadToCloudflare(file: File, folder: string): Promise<string | null> {
-    if (!file || file.size === 0) return null;
-
-    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-    const accessKeyId = process.env.CLOUDFLARE_ACCESS_KEY_ID;
-    const secretAccessKey = process.env.CLOUDFLARE_SECRET_ACCESS_KEY;
-    const bucketName = process.env.CLOUDFLARE_BUCKET_NAME;
-    const publicUrl = process.env.CLOUDFLARE_PUBLIC_URL; // e.g. https://cdn.orivomart.com
-
-    if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) {
-        console.error("Cloudflare R2 credentials missing");
-        return null;
-    }
-
-    try {
-        // Use S3 Client dynamically to avoid large bundle size if possible, 
-        // or just use standard fetch with AWS Signature v4 if we want to be super lightweight.
-        // For simplicity and speed in this context, we'll assume we might install @aws-sdk/client-s3 later
-        // BUT for now, since User requested "removed supabase", we'll just placeholder this unless we install AWS SDK.
-        // User asked for "Cloud Storage", usually implies R2/S3. 
-        // Let's Stub it for now or use a simple PUT if Presigned.
-
-        // Actually, without AWS SDK, R2 upload is tricky. 
-        // Let's assume we return null for now and User installs SDK or we mock it.
-        // Wait, User said "auth cloudflare". Maybe they mean Cloudflare Workers for Auth?
-        // But for "storage", usually R2.
-
-        console.warn("Cloudflare R2 upload not implemented without AWS SDK. Skipping upload.");
-        return null;
-    } catch (e) {
-        console.error("Upload failed", e);
-        return null;
-    }
-}
+import { uploadToStorage } from '@/utils/storage';
 
 
 export async function registerSeller(formData: FormData) {
@@ -108,7 +74,21 @@ export async function registerSeller(formData: FormData) {
             }
         });
 
-        // 4. Create Seller Record
+        // 4. Upload Files
+        const kycFile = formData.get('kycFile') as File;
+        const shopImageFile = formData.get('shopImageFile') as File;
+
+        let kycDocUrl = null;
+        let shopImageUrl = null;
+
+        if (kycFile && kycFile.size > 0) {
+            kycDocUrl = await uploadToStorage(kycFile, 'kyc', `kyc_${newUser.id}_${Date.now()}`);
+        }
+        if (shopImageFile && shopImageFile.size > 0) {
+            shopImageUrl = await uploadToStorage(shopImageFile, 'shop-images', `shop_${newUser.id}_${Date.now()}`);
+        }
+
+        // 5. Create Seller Record
         await prisma.seller.create({
             data: {
                 userId: newUser.id,
@@ -123,6 +103,8 @@ export async function registerSeller(formData: FormData) {
                 businessRegNum,
                 ghanaCardNum,
                 gpsAddress,
+                kycDocUrl: kycDocUrl || undefined,
+                image: shopImageUrl || undefined
             }
         });
 

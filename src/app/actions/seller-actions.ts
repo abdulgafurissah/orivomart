@@ -44,9 +44,11 @@ export async function updateSellerSettings(formData: FormData) {
     const description = formData.get('description') as string;
     const address = formData.get('address') as string;
     const city = formData.get('city') as string;
-    // Images ignored for now as we removed Supabase
-    // const shopImage = formData.get('shopImage') as File;
-    // const coverImage = formData.get('coverImage') as File; 
+    const shopImage = formData.get('shopImage') as File;
+    const coverImage = formData.get('coverImage') as File;
+
+    // Import helper
+    const { uploadToStorage } = await import('@/utils/storage');
 
     // Account Info
     const email = formData.get('email') as string;
@@ -69,7 +71,21 @@ export async function updateSellerSettings(formData: FormData) {
             if (!isValid) return { error: 'Incorrect current password' };
         }
 
-        // 3. Update Profile (User Account)
+        // 3. Upload Images
+        let imageUrl: string | undefined = undefined;
+        let coverImageUrl: string | undefined = undefined;
+
+        if (shopImage && shopImage.size > 0) {
+            const url = await uploadToStorage(shopImage, 'shop-images', `shop_${seller.userId}_${Date.now()}`);
+            if (url) imageUrl = url;
+        }
+
+        if (coverImage && coverImage.size > 0) {
+            const url = await uploadToStorage(coverImage, 'shop-images', `cover_${seller.userId}_${Date.now()}`);
+            if (url) coverImageUrl = url;
+        }
+
+        // 4. Update Profile (User Account) (Existing code...)
         let profileUpdates: any = {};
         if (ownerName) profileUpdates.fullName = ownerName;
         if (email && email !== seller.email) {
@@ -88,7 +104,7 @@ export async function updateSellerSettings(formData: FormData) {
             });
         }
 
-        // 4. Update Seller Details
+        // 5. Update Seller Details
         await prisma.seller.update({
             where: { id: seller.id },
             data: {
@@ -99,8 +115,8 @@ export async function updateSellerSettings(formData: FormData) {
                 address,
                 city,
                 email: email || seller.email,
-                // image: imageUrl, // Skipped
-                // coverImage: coverImageUrl // Skipped
+                image: imageUrl,
+                coverImage: coverImageUrl
             }
         });
 

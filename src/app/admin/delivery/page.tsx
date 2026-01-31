@@ -17,10 +17,18 @@ export default async function AdminDeliveryPage() {
 
     const deliveries = deliveryItems.map(item => ({
         ...item,
-        order: item.order,
+        price: Number(item.price),
+        createdAt: item.createdAt.toISOString(),
+        order: {
+            ...item.order,
+            totalAmount: Number(item.order.totalAmount),
+            createdAt: item.order.createdAt.toISOString(),
+            commitmentFee: Number(item.order.commitmentFee),
+            remainingBalance: Number(item.order.remainingBalance)
+        },
         seller: {
-            shop_name: item.seller?.shopName,
-            owner_name: item.seller?.ownerName
+            shop_name: item.seller?.shopName || 'Unknown Shop',
+            owner_name: item.seller?.ownerName || 'Unknown Owner'
         },
         product_name: item.productName,
         tracking_code: item.trackingCode,

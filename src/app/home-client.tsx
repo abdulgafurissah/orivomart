@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
+import { useToast } from '@/context/ToastContext';
 import styles from './page.module.css';
 import { FadeIn, SlideIn, StaggerContainer, StaggerItem } from '@/components/Animations';
 import { motion } from 'framer-motion';
@@ -41,6 +42,8 @@ export default function HomeClient({ products: initialProducts, sellers, user, c
     const isFirstRun = useRef(true);
 
     const { addToCart } = useCart();
+    const { addToast } = useToast();
+    const [addingToCartId, setAddingToCartId] = useState<string | null>(null);
 
     const fetchProducts = useCallback(async (reset: boolean = false) => {
         setLoading(true);
@@ -78,9 +81,6 @@ export default function HomeClient({ products: initialProducts, sellers, user, c
     useEffect(() => {
         if (isFirstRun.current) {
             isFirstRun.current = false;
-            // If initial state matches what we want, don't fetch. 
-            // However, initialProducts are "All" and "No Search".
-            // If user selects category, we must fetch.
             return;
         }
 
@@ -93,20 +93,25 @@ export default function HomeClient({ products: initialProducts, sellers, user, c
         fetchProducts(false);
     };
 
-    const handleAddToCart = (product: any) => {
+    const handleAddToCart = async (product: any) => {
+        setAddingToCartId(product.id);
+        // Simulate a small delay for better UX (optional, but makes it feel "real" if operations are too fast)
+        await new Promise(r => setTimeout(r, 500));
+
         // Map DB product to CartItem safely
         const cartItem: any = {
             id: product.id,
             name: product.name,
             price: Number(product.price),
             image: product.image || 'https://placehold.co/400',
-            shopId: product.seller?.id || product.sellerId, // DB has seller object included
+            shopId: product.seller?.id || product.sellerId,
             sellerId: product.seller?.id || product.sellerId,
             shopName: product.seller?.shopName || 'Unknown Shop',
             category: product.category
         };
         addToCart(cartItem);
-        alert(`Added ${product.name} to cart!`);
+        addToast(`Added ${product.name} to cart!`, 'success');
+        setAddingToCartId(null);
     };
 
     return (
@@ -455,10 +460,32 @@ export default function HomeClient({ products: initialProducts, sellers, user, c
                                                     <motion.button
                                                         whileTap={{ scale: 0.9 }}
                                                         onClick={() => handleAddToCart(product)}
+                                                        disabled={addingToCartId === product.id}
                                                         className="btn btn-primary"
-                                                        style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                                                        style={{
+                                                            padding: '8px 16px',
+                                                            fontSize: '0.9rem',
+                                                            opacity: addingToCartId === product.id ? 0.7 : 1,
+                                                            cursor: addingToCartId === product.id ? 'not-allowed' : 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '8px'
+                                                        }}
                                                     >
-                                                        Add
+                                                        {addingToCartId === product.id ? (
+                                                            <>
+                                                                <span style={{
+                                                                    width: '14px',
+                                                                    height: '14px',
+                                                                    border: '2px solid white',
+                                                                    borderTopColor: 'transparent',
+                                                                    borderRadius: '50%',
+                                                                    display: 'inline-block',
+                                                                    animation: 'spin 1s linear infinite'
+                                                                }}></span>
+                                                                Adding...
+                                                            </>
+                                                        ) : 'Add'}
                                                     </motion.button>
                                                 </div>
                                             </div>

@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import { CartProvider } from '@/context/CartContext';
+import { ToastProvider } from '@/context/ToastContext';
 import { getSession } from '@/utils/session';
 
 import Footer from '@/components/Footer';
@@ -61,18 +62,22 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSession();
+
   return (
     <html lang="en">
       <body className={inter.className} suppressHydrationWarning>
-        <CartProvider>
-          <Navbar user={await getSession()} />
-          <main style={{ paddingTop: '80px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ flex: 1 }}>
-              {children}
-            </div>
-            <Footer />
-          </main>
-        </CartProvider>
+        <ToastProvider>
+          <CartProvider>
+            <Navbar user={session} />
+            <main style={{ paddingTop: '80px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ flex: 1 }}>
+                {children}
+              </div>
+              <Footer />
+            </main>
+          </CartProvider>
+        </ToastProvider>
       </body>
     </html>
   );

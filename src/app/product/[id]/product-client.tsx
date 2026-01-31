@@ -1,13 +1,24 @@
 'use client';
 
+import { useState } from 'react';
 import { useCart } from '@/context/CartContext';
+import { useToast } from '@/context/ToastContext';
 import Link from 'next/link';
 
 export default function ProductClient({ product }: { product: any }) {
     const { addToCart } = useCart();
+    const { addToast } = useToast();
+    const [adding, setAdding] = useState(false);
+
     const shop = product.seller;
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
+        if (adding) return;
+        setAdding(true);
+
+        // UX delay
+        await new Promise(r => setTimeout(r, 500));
+
         // Map to CartItem
         const cartItem: any = {
             id: product.id,
@@ -21,7 +32,8 @@ export default function ProductClient({ product }: { product: any }) {
             category: product.category
         };
         addToCart(cartItem);
-        alert(`Added ${product.name} to cart!`);
+        addToast(`Added ${product.name} to cart!`, 'success');
+        setAdding(false);
     };
 
     return (
@@ -88,10 +100,24 @@ export default function ProductClient({ product }: { product: any }) {
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <button
                             onClick={handleAddToCart}
+                            disabled={adding}
                             className="btn btn-primary"
-                            style={{ flex: 1, padding: '14px' }}
+                            style={{ flex: 1, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', opacity: adding ? 0.7 : 1, cursor: adding ? 'not-allowed' : 'pointer' }}
                         >
-                            Add to Cart
+                            {adding ? (
+                                <>
+                                    <span style={{
+                                        width: '18px',
+                                        height: '18px',
+                                        border: '2px solid white',
+                                        borderTopColor: 'transparent',
+                                        borderRadius: '50%',
+                                        display: 'inline-block',
+                                        animation: 'spin 1s linear infinite'
+                                    }}></span>
+                                    Adding...
+                                </>
+                            ) : 'Add to Cart'}
                         </button>
                         <button className="btn btn-secondary" style={{ padding: '14px' }}>
                             ❤

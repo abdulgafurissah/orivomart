@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useToast } from '@/context/ToastContext';
 import { login } from '@/app/actions/auth-actions';
 
 import styles from '../auth.module.css';
 
 export default function SignIn() {
     const [isLoading, setIsLoading] = useState(false);
+    const { addToast } = useToast();
 
     const handleSubmit = async (formData: FormData) => {
         setIsLoading(true);
@@ -15,7 +17,7 @@ export default function SignIn() {
 
         if (result?.error) {
             const msg = typeof result.error === 'string' ? result.error : JSON.stringify(result.error);
-            alert(msg);
+            addToast(msg, 'error');
             setIsLoading(false);
         }
     };

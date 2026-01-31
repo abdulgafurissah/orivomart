@@ -61,7 +61,40 @@ export async function updateOrderItemStatus(itemId: string, newStatus: string) {
             data: { deliveryStatus: newStatus }
         });
 
-        // Revalidate the sales page
+        const { revalidatePath } = await import('next/cache');
+        revalidatePath('/dashboard/sales');
+
+        return { success: true };
+    } catch (error: any) {
+        return { error: error.message };
+    }
+}
+
+export async function deleteOrderItem(itemId: string) {
+    const session = await getSession();
+    if (!session || session.role !== 'seller') return { error: 'Unauthorized' };
+
+    try {
+        // Validation: Ensure item belongs to seller
+        const seller = await prisma.seller.findUnique({ where: { userId: session.userId } });
+        const item = await prisma.orderItem.findUnique({ where: { id: itemId } });
+
+        if (!item || !seller || (item.sellerId && item.sellerId !== seller.id)) {
+            // Fallback check via product ownership if sellerId is missing
+            if (item && item.productId) {
+                const product = await prisma.product.findUnique({ where: { id: item.productId } });
+                if (!product || product.sellerId !== seller?.id) {
+                    return { error: 'Unauthorized: Item not found or not yours' };
+                }
+            } else {
+                return { error: 'Unauthorized' };
+            }
+        }
+
+        await prisma.orderItem.delete({
+            where: { id: itemId }
+        });
+
         const { revalidatePath } = await import('next/cache');
         revalidatePath('/dashboard/sales');
 

@@ -7,10 +7,11 @@ import HomeClient from './home-client';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const products = await getPublicProducts();
-  const sellers = await getPublicSellers();
-  const categories = await getCategories();
-  const session = await getSession();
+  const [products, categories, session] = await Promise.all([
+    getPublicProducts(),
+    getCategories(),
+    getSession()
+  ]);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -54,7 +55,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
       />
-      <HomeClient products={products} sellers={sellers} user={session} categories={categories} />
+      <HomeClient products={products} sellers={[]} user={session} categories={categories} />
     </>
   );
 }
